@@ -1,7 +1,7 @@
 from math import *
 import numpy as np
 
-# create a rotation matrix
+# create a rotation matrix 123
 def rotateMatrix(theta,beta,gamma):
     rx = [[1,0,0],[0,cos(theta),-sin(theta)],[0,sin(theta),cos(theta)]]
     ry = [[cos(beta),0,sin(beta)],[0,1,0],[-sin(beta),0,cos(beta)]]
