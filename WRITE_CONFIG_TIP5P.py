@@ -42,6 +42,7 @@ small_D = D/l  # sidelength of a small cell
 N = 1000       # number of particles in the boxs
 I1 = 0.9572
 I2 = 0.7000
+natm = 5
 
 for n in range(1,N+1):
     fout.write("OW".ljust(8)+str((n-1)*3+1).rjust(10)+"\n")    # write the coordinate of oxygen atom
@@ -72,16 +73,16 @@ for n in range(1,N+1):
     r4 = np.dot(R,r4)
 
     # randomly put the atoms in the unit cell while keeping the structure right
-    fout.write("HW".ljust(8)+str((n-1)*3+2).rjust(10)+"\n")    # write the coordinate of hydrogen atom
+    fout.write("HW".ljust(8)+str((n-1)*natm+2).rjust(10)+"\n")    # write the coordinate of hydrogen atom
     fout.write(("%.12f" % (r1[0]+x)).rjust(20)+("%.12f" % (r1[1]+y)).rjust(20)+("%.12f" % (r1[2]+z)).rjust(20)+"\n")
 
-    fout.write("HW".ljust(8)+str((n-1)*3+3).rjust(10)+"\n")
+    fout.write("HW".ljust(8)+str((n-1)*natm+3).rjust(10)+"\n")
     fout.write(("%.12f" % (r2[0]+x)).rjust(20)+("%.12f" % (r2[1]+y)).rjust(20)+("%.12f" % (r2[2]+z)).rjust(20)+"\n")
 
-    fout.write("OEW".ljust(8)+str((n-1)*3+3).rjust(10)+"\n")
+    fout.write("OEW".ljust(8)+str((n-1)*natm+4).rjust(10)+"\n")
     fout.write(("%.12f" % (r3[0]+x)).rjust(20)+("%.12f" % (r3[1]+y)).rjust(20)+("%.12f" % (r3[2]+z)).rjust(20)+"\n")
 
-    fout.write("OEW".ljust(8)+str((n-1)*3+3).rjust(10)+"\n")
+    fout.write("OEW".ljust(8)+str((n-1)*natm+5).rjust(10)+"\n")
     fout.write(("%.12f" % (r4[0]+x)).rjust(20)+("%.12f" % (r4[1]+y)).rjust(20)+("%.12f" % (r4[2]+z)).rjust(20)+"\n")
 
 fout.close()
