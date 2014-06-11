@@ -1,11 +1,28 @@
 from math import *
 import numpy as np
+from time import strftime
+import sys
+
+if len(sys.argv) != 4:
+    print "Arguments should be: sidelength, # of molecules and output file"
+    sys.exit()
+else:
+    D = sys.argv[1]         # sidelength of simulation cubic box
+    N = sys.argv[2]         # number of particles in the box
+    filedirectory_to = sys.argv[4]
+
+# create a rotation matrix
+def rotateMatrix(theta,beta,gamma):
+    rx = [[1,0,0],[0,cos(theta),-sin(theta)],[0,sin(theta),cos(theta)]]
+    ry = [[cos(beta),0,sin(beta)],[0,1,0],[-sin(beta),0,cos(beta)]]
+    rz = [[cos(gamma),-sin(gamma),0],[sin(gamma),cos(gamma),0],[0,0,1]]
+    return np.dot(np.dot(rx,ry),rz)
 
 # create and open CONFIG file
-fout = open("CONFIG","w")
+fout = open(filedirectory_to,"w")
 
 # write the header
-fout.write("NVT simulation of symmetry water model Shi 2014.06.09\n")
+fout.write("Configurations for TIP5P water model "+strftime("%Y-%m-%d %H:%H:%S")+'\n')
 
 # write the levcfg and imcon key
 # levcfg: 0 Coordinates included in file
@@ -22,7 +39,6 @@ fout.write("NVT simulation of symmetry water model Shi 2014.06.09\n")
 fout.write(str(0).rjust(10)+str(2).rjust(10)+"\n")
 
 # write the simulation box cell vector
-D = 32.5  # sidelength of simulation cubic box
 fout.write((str(D)+"000000000000").rjust(20)+("%.12f" % 0.00).rjust(20)+("%.12f" % 0.00).rjust(20)+"\n")
 fout.write(("%.12f" % 0.00).rjust(20)+(str(D)+"000000000000").rjust(20)+("%.12f" % 0.00).rjust(20)+"\n")
 fout.write(("%.12f" % 0.00).rjust(20)+("%.12f" % 0.00).rjust(20)+(str(D)+"000000000000").rjust(20)+"\n")
@@ -30,10 +46,10 @@ fout.write(("%.12f" % 0.00).rjust(20)+("%.12f" % 0.00).rjust(20)+(str(D)+"000000
 # write the coordinates of SPC/E water atoms
 # initially put all atoms approximately at the lattice points
 
-l = 10.0       # total number of particles is 1000. 1000**(1/3)=10
+l = ceil(N**(1./3.))       # Ex. total number of particles is 1000. 1000**(1/3)=10
 small_D = D/l  # sidelength of a small cell
-N = 1000       # number of particles in the box
-I1 = 0.92
+I1 = 0.9572
+I2 = 0.7000
 natm = 5
 
 for n in range(1,N+1):
@@ -53,33 +69,28 @@ for n in range(1,N+1):
     phi2 = 2*pi*np.random.random()
     phi3 = 2*pi*np.random.random()
 
-    x1 = I1*sin(phi2)+x
-    y1 = -I1*cos(phi2)*sin(phi1)+y
-    z1 = I1*cos(phi2)*cos(phi1)+z
+    r1 = np.array([0,I1*cos(104.52*pi/360),I1*sin(104.52*pi/360)])
+    r2 = np.array([0,I1*cos(104.52*pi/360),-I1*sin(104.52*pi/360)])
+    r3 = np.array([I2*sin(109.47*pi/360),-I2*cos(109.47*pi/360),0])
+    r4 = np.array([-I2*sin(109.47*pi/360),-I2*cos(109.47*pi/360),0])
 
-    x2 = -(1./3.)*sqrt(2)*I1*cos(phi2)*cos(phi3)-(1./3.)*I1*sin(phi2)-sqrt(2./3.)*I1*cos(phi2)*sin(phi3)+x
-    y2 = (1./3.)*I1*cos(phi2)*sin(phi1)-(1./3.)*sqrt(2)*I1*(cos(phi1)*sin(phi3)+cos(phi3)*sin(phi2)*sin(phi1))+sqrt(2./3.)*I1*(cos(phi3)*cos(phi1)-sin(phi2)*sin(phi3)*sin(phi1))+y
-    z2 = -(1./3.)*I1*cos(phi2)*cos(phi1)+sqrt(2./3.)*I1*(cos(phi1)*sin(phi2)*sin(phi3)+cos(phi3)*sin(phi1))-(1./3.)*sqrt(2)*I1*(-cos(phi3)*cos(phi1)*sin(phi2)+sin(phi3)*sin(phi1))+z
+    R = rotateMatrix(phi1,phi2,phi3)
+    r1 = np.dot(R,r1)
+    r2 = np.dot(R,r2)
+    r3 = np.dot(R,r3)
+    r4 = np.dot(R,r4)
 
-    x3 = (2./3.)*sqrt(2)*I1*cos(phi2)*cos(phi3)-(1./3.)*I1*sin(phi2)+x
-    y3 = (1./3.)*I1*cos(phi2)*sin(phi1)+(2./3.)*sqrt(2)*I1*(cos(phi1)*sin(phi3)+cos(phi3)*sin(phi2)*sin(phi1))+y
-    z3 = -(1./3.)*I1*cos(phi2)*cos(phi1)+(2./3.)*sqrt(2)*I1*(-cos(phi3)*cos(phi1)*sin(phi2)+sin(phi3)*sin(phi1))+z
-
-    x4 = -(1./3.)*sqrt(2)*I1*cos(phi2)*cos(phi3)-(1./3.)*I1*sin(phi2)+sqrt(2./3.)*I1*cos(phi2)*sin(phi3)+x
-    y4 = (1./3.)*I1*cos(phi2)*sin(phi1)-(1./3.)*sqrt(2)*I1*(cos(phi1)*sin(phi3)+cos(phi3)*sin(phi2)*sin(phi1))-sqrt(2./3.)*I1*(cos(phi3)*cos(phi1)-sin(phi2)*sin(phi3)*sin(phi1))+y
-    z4 = -(1./3.)*I1*cos(phi2)*cos(phi1)-sqrt(2./3.)*I1*(cos(phi1)*sin(phi2)*sin(phi3)+cos(phi3)*sin(phi1))-(1./3.)*sqrt(2)*I1*(-cos(phi3)*cos(phi1)*sin(phi2)+sin(phi3)*sin(phi1))+z
-
-    # randomly put the Hydrogen atoms in the unit cell while keeping the structure right
+    # randomly put the atoms in the unit cell while keeping the structure right
     fout.write("HW".ljust(8)+str((n-1)*natm+2).rjust(10)+"\n")    # write the coordinate of hydrogen atom
-    fout.write(("%.12f" % (x1)).rjust(20)+("%.12f" % (y1)).rjust(20)+("%.12f" % (z1)).rjust(20)+"\n")
+    fout.write(("%.12f" % (r1[0]+x)).rjust(20)+("%.12f" % (r1[1]+y)).rjust(20)+("%.12f" % (r1[2]+z)).rjust(20)+"\n")
 
     fout.write("HW".ljust(8)+str((n-1)*natm+3).rjust(10)+"\n")
-    fout.write(("%.12f" % (x2)).rjust(20)+("%.12f" % (y2)).rjust(20)+("%.12f" % (z2)).rjust(20)+"\n")
+    fout.write(("%.12f" % (r2[0]+x)).rjust(20)+("%.12f" % (r2[1]+y)).rjust(20)+("%.12f" % (r2[2]+z)).rjust(20)+"\n")
 
     fout.write("OEW".ljust(8)+str((n-1)*natm+4).rjust(10)+"\n")
-    fout.write(("%.12f" % (x3)).rjust(20)+("%.12f" % (y3)).rjust(20)+("%.12f" % (z3)).rjust(20)+"\n")
+    fout.write(("%.12f" % (r3[0]+x)).rjust(20)+("%.12f" % (r3[1]+y)).rjust(20)+("%.12f" % (r3[2]+z)).rjust(20)+"\n")
 
     fout.write("OEW".ljust(8)+str((n-1)*natm+5).rjust(10)+"\n")
-    fout.write(("%.12f" % (x4)).rjust(20)+("%.12f" % (y4)).rjust(20)+("%.12f" % (z4)).rjust(20)+"\n")
+    fout.write(("%.12f" % (r4[0]+x)).rjust(20)+("%.12f" % (r4[1]+y)).rjust(20)+("%.12f" % (r4[2]+z)).rjust(20)+"\n")
 
 fout.close()
