@@ -45,9 +45,9 @@ fout.write('Configurations for symmetry water model '+'I1='+str(I1)+'  '+strftim
 fout.write(str(0).rjust(10)+str(2).rjust(10)+"\n")
 
 # write the simulation box cell vector
-fout.write((str(D)+"000000000000").rjust(20)+("%.12f" % 0.00).rjust(20)+("%.12f" % 0.00).rjust(20)+"\n")
-fout.write(("%.12f" % 0.00).rjust(20)+(str(D)+"000000000000").rjust(20)+("%.12f" % 0.00).rjust(20)+"\n")
-fout.write(("%.12f" % 0.00).rjust(20)+("%.12f" % 0.00).rjust(20)+(str(D)+"000000000000").rjust(20)+"\n")
+fout.write(format(D,'.12f').rjust(20)+("%.12f" % 0.00).rjust(20)+("%.12f" % 0.00).rjust(20)+"\n")
+fout.write(("%.12f" % 0.00).rjust(20)+format(D,'.12f').rjust(20)+("%.12f" % 0.00).rjust(20)+"\n")
+fout.write(("%.12f" % 0.00).rjust(20)+("%.12f" % 0.00).rjust(20)+format(D,'.12f').rjust(20)+"\n")
 
 # write the coordinates of SPC/E water atoms
 # initially put all atoms approximately at the lattice points
