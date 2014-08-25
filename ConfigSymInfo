@@ -1,0 +1,11 @@
+Configurations for symmetry water model in confined two walls system Guang Shi 06.17.2014
+VX  27.72  0.0   0.0
+VY  0.0  27.72   0.0
+VZ  0.0  0.0    140.0
+vx  27.72   0.0  0.0
+vy  0.0   27.72  0.0
+vz  0.0   0.0    39.0
+levcfg  0
+imcon  2
+nmolecules 1024
+I1 0.88

@@ -3,19 +3,39 @@ import numpy as np
 from time import strftime
 import sys
 
-if len(sys.argv) != 5:
-    print "Arguments should be: sidelength, # of molecules and I1 and output file"
+with open('ConfigSymInfo','r') as f:
+    for i, line in enumerate(f):
+        if i == 0:
+            contr_header = line
+        # LX,LY,LZ are the dimension of simulation box
+        # lx,ly,lz are the dimension of actuall space you want the particles distributed in
+        if line.split()[0] == 'VX':
+            VX = np.array([float(line.split()[1]),float(line.split()[2]),float(line.split()[3])])
+        elif line.split()[0] == 'VY':
+            VY = np.array([float(line.split()[1]),float(line.split()[2]),float(line.split()[3])])
+        elif line.split()[0] == 'VZ':
+            VZ = np.array([float(line.split()[1]),float(line.split()[2]),float(line.split()[3])])
+        elif line.split()[0] == 'vx':
+            vx = np.array([float(line.split()[1]),float(line.split()[2]),float(line.split()[3])])
+        elif line.split()[0] == 'vy':
+            vy = np.array([float(line.split()[1]),float(line.split()[2]),float(line.split()[3])])
+        elif line.split()[0] == 'vz':
+            vz = np.array([float(line.split()[1]),float(line.split()[2]),float(line.split()[3])])
+        elif line.split()[0] == 'levcfg':
+            levcfg = int(line.split()[1])      # see below
+        elif line.split()[0] == 'imcon':
+            imcon = int(line.split()[1])       # see below
+        elif line.split()[0] == 'nmolecules':
+            N = int(line.split()[1])           # number of molecules in the box
+        elif line.split()[0] == 'I1':
+            I1 = float(line.split()[1])        # declare the value of I1. Refer to Water Model
+
+
+if len(sys.argv) != 2:
+    print "Arguments should be: output file"
     sys.exit()
 else:
-    D = float(sys.argv[1])         # sidelength of simulation cubic box
-    N = sys.argv[2]                # number of particles in the box
-    if float(N) == int(N):
-        N = int(N)
-    else:
-        print "the number of molecules must be an integer"
-        sys.exit()
-    I1 = float(sys.argv[3])        # declare the value of I1. Refer to Water Model
-    filedirectory_to = sys.argv[4]
+    filedirectory_to = sys.argv[1]
 
 # create a rotation matrix
 def rotateMatrix(theta,beta,gamma):
@@ -28,7 +48,7 @@ def rotateMatrix(theta,beta,gamma):
 fout = open(filedirectory_to,"w")
 
 # write the header
-fout.write('Configurations for symmetry water model '+'I1='+str(I1)+'  '+strftime("%Y-%m-%d %H:%H:%S")+'\n')
+fout.write(contr_header.rstrip()+' I1='+str(I1)+'  '+strftime("%Y-%m-%d %H:%H:%S")+'\n')
 
 # write the levcfg and imcon key
 # levcfg: 0 Coordinates included in file
@@ -42,18 +62,26 @@ fout.write('Configurations for symmetry water model '+'I1='+str(I1)+'  '+strftim
 #         5 rhombic dodecahedral boundary conditions
 #         6 x-y parallelogram boundary conditions with no periodicity in the z direction
 #         7 hexagonal prism boundary conditions
-fout.write(str(0).rjust(10)+str(2).rjust(10)+"\n")
+fout.write(str(levcfg).rjust(10)+str(imcon).rjust(10)+"\n")
 
 # write the simulation box cell vector
-fout.write(format(D,'.12f').rjust(20)+("%.12f" % 0.00).rjust(20)+("%.12f" % 0.00).rjust(20)+"\n")
-fout.write(("%.12f" % 0.00).rjust(20)+format(D,'.12f').rjust(20)+("%.12f" % 0.00).rjust(20)+"\n")
-fout.write(("%.12f" % 0.00).rjust(20)+("%.12f" % 0.00).rjust(20)+format(D,'.12f').rjust(20)+"\n")
+fout.write(format(VX[0],'.12f').rjust(20)+format(VX[1],'.12f').rjust(20)+format(VX[2],'.12f').rjust(20)+"\n")
+fout.write(format(VY[0],'.12f').rjust(20)+format(VY[1],'.12f').rjust(20)+format(VY[2],'.12f').rjust(20)+"\n")
+fout.write(format(VZ[0],'.12f').rjust(20)+format(VZ[1],'.12f').rjust(20)+format(VZ[2],'.12f').rjust(20)+"\n")
 
 # write the coordinates of SPC/E water atoms
 # initially put all atoms approximately at the lattice points
 
-l = ceil(N**(1./3.))       # total number of particles is 1000. 1000**(1/3)=10
-small_D = D/l              # sidelength of a small cell
+lx = sqrt(vx[0]**2+vx[1]**2+vx[2]**2)
+ly = sqrt(vy[0]**2+vy[1]**2+vy[2]**2)
+lz = sqrt(vz[0]**2+vz[1]**2+vz[2]**2)
+
+small_D = (lx*ly*lz/float(N))**(1./3.)         # sidelength of a small cell. each such cell contains one molecule
+
+nx = int(ceil(lx/small_D))
+ny = int(ceil(ly/small_D))
+nz = int(ceil(lz/small_D))
+
 natm = 5
 
 # mole_struchedral water stucture
@@ -62,13 +90,13 @@ mole_struc0 = np.array([[0,0,I1],[-2*sqrt(2)*I1/3.,0,-I1/3.],[sqrt(2)*I1/3.,-sqr
 
 for n in range(1,N+1):
     fout.write("OW".ljust(8)+str((n-1)*natm+1).rjust(10)+"\n")    # write the coordinate of oxygen atom
-    k = ceil((float(n)/(int(l)**2)))
-    temp = n-(k-1)*int(l)**2
-    j = ceil(temp/l)
-    i = temp - (j-1)*l
-    x = -(j-1)*small_D + (D/2.0 - small_D/2.0)
-    y = (i-1)*small_D + (-D/2.0 + small_D/2.0)
-    z = -(k-1)*small_D + (D/2.0 - small_D/2.0)
+    k = int(ceil(float(n)/(nx*ny)))
+    temp = n-(k-1)*(nx*ny)
+    j = ceil(float(temp)/ny)
+    i = temp - (j-1)*ny
+    x = -(j-1)*(lx/nx) + (lx/2.0 - (lx/nx)/2.0)
+    y = (i-1)*(ly/ny) + (-ly/2.0 + (ly/ny)/2.0)
+    z = -(k-1)*(lz/nz) + (lz/2.0 - (lz/nz)/2.0)
     fout.write(("%.12f" % x).rjust(20)+("%.12f" % y).rjust(20)+("%.12f" % z).rjust(20)+"\n")
     # assign the zero initial velocities to each particles
     #fout.write(("%.12f" % 0.00).rjust(20)+("%.12f" % 0.00).rjust(20)+("%.12f" % 0.00).rjust(20)+"\n")

@@ -1,11 +1,26 @@
 from math import *
 import numpy as np
+import sys
+from time import strftime
+
+if len(sys.argv) != 4:
+    print "Arguments should be: sidelength, # of molecules and I1 and output file"
+    sys.exit()
+else:
+    D = float(sys.argv[1])         # sidelength of simulation cubic box
+    N = sys.argv[2]                # number of particles in the box
+    if float(N) == int(N):
+        N = int(N)
+    else:
+        print "the number of molecules must be an integer"
+        sys.exit()
+    filedirectory_to = sys.argv[3]
 
 # create and open CONFIG file
-fout = open("tCONFIG","w")
+fout = open(filedirectory_to,"w")
 
 # write the header
-fout.write("NVT simulation of Gaussian Truncated SPC/E water Shi 2014.05.08\n")
+fout.write('Configurations for SPCE water model '+strftime("%Y-%m-%d %H:%H:%S")+'\n')
 
 # write the levcfg and imcon key
 # levcfg: 0 Coordinates included in file
@@ -22,7 +37,6 @@ fout.write("NVT simulation of Gaussian Truncated SPC/E water Shi 2014.05.08\n")
 fout.write(str(0).rjust(10)+str(2).rjust(10)+"\n")
 
 # write the simulation box cell vector
-D = 32.5  # sidelength of simulation cubic box
 fout.write((str(D)+"000000000000").rjust(20)+("%.12f" % 0.00).rjust(20)+("%.12f" % 0.00).rjust(20)+"\n")
 fout.write(("%.12f" % 0.00).rjust(20)+(str(D)+"000000000000").rjust(20)+("%.12f" % 0.00).rjust(20)+"\n")
 fout.write(("%.12f" % 0.00).rjust(20)+("%.12f" % 0.00).rjust(20)+(str(D)+"000000000000").rjust(20)+"\n")
@@ -30,12 +44,12 @@ fout.write(("%.12f" % 0.00).rjust(20)+("%.12f" % 0.00).rjust(20)+(str(D)+"000000
 # write the coordinates of SPC/E water atoms
 # initially put all atoms approximately at the lattice points
 
-l = 10.0       # total number of particles is 1000. 1000**(1/3)=10
-small_D = D/l  # sidelength of a small cell
-N = 1000       # number of particles in the box
+l = ceil(N**(1./3.))       # total number of particles is 1000. 1000**(1/3)=10
+small_D = D/l              # sidelength of a small cell
+natm = 3
 
 for n in range(1,N+1):
-    fout.write("OW".ljust(8)+str((n-1)*3+1).rjust(10)+"\n")    # write the coordinate of oxygen atom
+    fout.write("OW".ljust(8)+str((n-1)*natm+1).rjust(10)+"\n")    # write the coordinate of oxygen atom
     k = ceil((float(n)/(int(l)**2)))
     temp = n-(k-1)*int(l)**2
     j = ceil(temp/l)
@@ -60,10 +74,10 @@ for n in range(1,N+1):
     z2 = -sin(theta1)*sin(phi2)*sin(theta2)+cos(theta1)*cos(theta2)
 
     # randomly put the Hydrogen atoms in the unit cell while keeping the structure right
-    fout.write("HW".ljust(8)+str((n-1)*3+2).rjust(10)+"\n")    # write the coordinate of hydrogen atom
+    fout.write("HW".ljust(8)+str((n-1)*natm+2).rjust(10)+"\n")    # write the coordinate of hydrogen atom
     fout.write(("%.12f" % (x1+x)).rjust(20)+("%.12f" % (y1+y)).rjust(20)+("%.12f" % (z1+z)).rjust(20)+"\n")
 
-    fout.write("HW".ljust(8)+str((n-1)*3+3).rjust(10)+"\n")
+    fout.write("HW".ljust(8)+str((n-1)*natm+3).rjust(10)+"\n")
     fout.write(("%.12f" % (x2+x)).rjust(20)+("%.12f" % (y2+y)).rjust(20)+("%.12f" % (z2+z)).rjust(20)+"\n")
 
 fout.close()

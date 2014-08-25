@@ -60,7 +60,7 @@ natm = 5
 mole_struc0 = np.array([[0,I1*cos(104.52*pi/360),I1*sin(104.52*pi/360)],[0,I1*cos(104.52*pi/360),-I1*sin(104.52*pi/360)],[I2*sin(109.47*pi/360),-I2*cos(109.47*pi/360),0],[-I2*sin(109.47*pi/360),-I2*cos(109.47*pi/360),0]])
 
 for n in range(1,N+1):
-    fout.write("OW".ljust(8)+str((n-1)*3+1).rjust(10)+"\n")    # write the coordinate of oxygen atom
+    fout.write("OW".ljust(8)+str((n-1)*natm+1).rjust(10)+"\n")    # write the coordinate of oxygen atom
     k = ceil((float(n)/(int(l)**2)))
     temp = n-(k-1)*int(l)**2
     j = ceil(temp/l)
