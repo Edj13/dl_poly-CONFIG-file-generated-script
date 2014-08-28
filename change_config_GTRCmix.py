@@ -46,17 +46,17 @@ with open(filename_to,'w') as f:
 			mark = True
 			ii = i
 			index += 1
-		elif mark and i == ii + 1 or i == ii + 2 or i == ii + 3:
+		elif mark and (i == ii + 1 or i == ii + 2 or i == ii + 3):
 			f.write(line)
 		elif mark and i == ii + 4:
 			f.write('HG'+'               '+str(index)+'\n')
 			index += 1
-		elif mark and i == ii + 5 or i == ii + 6 or i == ii + 7:
+		elif mark and (i == ii + 5 or i == ii + 6 or i == ii + 7):
 			f.write(line)
 		elif mark and i == ii + 8:
 			f.write('HG'+'               '+str(index)+'\n')
 			index += 1
-		elif mark and i == ii + 9 or i == ii + 10:
+		elif mark and (i == ii + 9 or i == ii + 10):
 			f.write(line)
 		elif mark and i == ii + 11:
 			f.write(line)
