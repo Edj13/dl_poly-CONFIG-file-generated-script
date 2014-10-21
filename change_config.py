@@ -10,6 +10,8 @@ with open(filename,'r') as f:
 	for i,line in enumerate(f):
 		if i == 1:
 			keytrj = int(line.split()[0])
+		elif i == 4:
+			LZ = float(line.split()[2])
 
 with open(filename,'r') as f:
 	for i, line in enumerate(f):
@@ -45,5 +47,9 @@ with open(filename,'r') as f:
 			writefile.append(line)
 
 with open('CONFIG.temp','w') as f:
-	for line in writefile:
-		f.write(line)
+	for i in range(len(writefile)):
+		line = writefile[i]
+		if i == 4:
+			f.write(("%.12f" % 0.00).rjust(20)+("%.12f" % 0.00).rjust(20)+format(3*LZ,'.12f').rjust(20)+'\n')
+		else:
+			f.write(line)

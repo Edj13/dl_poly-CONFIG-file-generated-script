@@ -4,7 +4,7 @@ from math import *
 fout = open("CONFIG","w")
 
 # write the header
-fout.write("mW water Shi 2014.04.30\n")
+fout.write("LJ particles Shi 2014.10.06\n")
 
 # write the levcfg and imcon key
 # levcfg: 0 Coordinates included in file
@@ -21,7 +21,7 @@ fout.write("mW water Shi 2014.04.30\n")
 fout.write(str(0).rjust(10)+str(2).rjust(10)+"\n")
 
 # write the simulation box cell vector
-D = 32.5  # sidelength of simulation cubic box
+D = 35.0  # sidelength of simulation cubic box
 fout.write((str(D)+"000000000000").rjust(20)+("%.12f" % 0.00).rjust(20)+("%.12f" % 0.00).rjust(20)+"\n")
 fout.write(("%.12f" % 0.00).rjust(20)+(str(D)+"000000000000").rjust(20)+("%.12f" % 0.00).rjust(20)+"\n")
 fout.write(("%.12f" % 0.00).rjust(20)+("%.12f" % 0.00).rjust(20)+(str(D)+"000000000000").rjust(20)+"\n")
@@ -34,7 +34,7 @@ small_D = D/l  # sidelength of a small cell
 N = 1000       # number of particles in the box
 
 for n in range(1,N+1):
-    fout.write("water".ljust(8)+str(n).rjust(10)+"\n")
+    fout.write("ljp".ljust(8)+str(n).rjust(10)+"\n")
     k = ceil((float(n)/(int(l)**2)))
     temp = n-(k-1)*int(l)**2
     j = ceil(temp/l)
