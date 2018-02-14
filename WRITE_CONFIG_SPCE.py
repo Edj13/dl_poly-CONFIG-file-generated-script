@@ -3,9 +3,9 @@ import numpy as np
 import sys
 from time import strftime
 
-if len(sys.argv) != 4:
+if len(sys.argv) != 4:        #sys,argv:实现从程序外部向程序传递参数
     print "Arguments should be: sidelength, # of molecules and I1 and output file"
-    sys.exit()
+    sys.exit()    #程序中间的退出
 else:
     D = float(sys.argv[1])         # sidelength of simulation cubic box
     N = sys.argv[2]                # number of particles in the box
